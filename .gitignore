@@ -16,3 +16,5 @@ RudolfKurka.StructPacker/RudolfKurka.StructPacker.csproj.user
 .vs/
 AttachableDebugApp/AttachableDebugApp/obj/
 AttachableDebugApp/AttachableDebugApp/bin/
+_ReSharper.Caches/**
+.idea/**
