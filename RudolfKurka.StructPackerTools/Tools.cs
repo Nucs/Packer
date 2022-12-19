@@ -108,20 +108,20 @@ namespace StructPacker
         private static readonly Encoding StringEnc = Encoding.UTF8;
 
         public static void UnpackMsg<T>(ref T msg, Stream sourceStream, ReadPropsFromStreamDeleg<T> readProps)
-            where T : struct
+            
         {
             using PooledBuffer slice = PooledBuffer.Get(GpBufferSize);
             readProps(ref msg, sourceStream, slice.Data);
         }
 
         public static void UnpackMsg<T>(ref T msg, byte[] sourceData, ref int index, ReadPropsFromBytesDeleg<T> readProps)
-            where T : struct
+            
         {
             readProps(ref msg, sourceData, ref index);
         }
 
         public static PooledBuffer PackMsgToBuffer<T>(ref T msg, int msgSize, WritePropsDeleg<T> writeProps)
-            where T : struct
+            
         {
             PooledBuffer data = PooledBuffer.Get(msgSize);
             int index = 0;
@@ -130,7 +130,7 @@ namespace StructPacker
         }
 
         public static void PackMsgToStream<T>(ref T msg, Stream destinationStream, int msgSize, WritePropsDeleg<T> writeProps)
-            where T : struct
+            
         {
             using PooledBuffer slice = PooledBuffer.Get(msgSize);
             int index = 0;
@@ -139,7 +139,7 @@ namespace StructPacker
         }
 
         public static byte[] PackMsgToArray<T>(ref T msg, int msgSize, WritePropsDeleg<T> writeProps)
-            where T : struct
+            
         {
             using PooledBuffer slice = PooledBuffer.Get(msgSize);
             int index = 0;
@@ -147,11 +147,11 @@ namespace StructPacker
             return slice.ToArray();
         }
 
-        public delegate void ReadPropsFromStreamDeleg<T>(ref T msg, Stream srcStream, byte[] gpBuffer) where T : struct;
+        public delegate void ReadPropsFromStreamDeleg<T>(ref T msg, Stream srcStream, byte[] gpBuffer) ;
 
-        public delegate void ReadPropsFromBytesDeleg<T>(ref T msg, byte[] srcBytes, ref int startIndex) where T : struct;
+        public delegate void ReadPropsFromBytesDeleg<T>(ref T msg, byte[] srcBytes, ref int startIndex) ;
 
-        public delegate void WritePropsDeleg<T>(ref T msg, byte[] destBytes, ref int index) where T : struct;
+        public delegate void WritePropsDeleg<T>(ref T msg, byte[] destBytes, ref int index) ;
 
         private static byte ReadByteFromStream(Stream str, byte[] gpBuffer)
         {
@@ -239,7 +239,7 @@ namespace StructPacker
         }
 
         private static T[] ReadArray1DFast<T>(Stream sourceStream, byte[] buffer, int itemSize)
-            where T : struct
+            
         {
             int? length = ReadArrayLength(sourceStream, buffer);
 
@@ -266,7 +266,7 @@ namespace StructPacker
         }
 
         private static T[] ReadArray1DFast<T>(byte[] srcBytes, int itemSize, ref int startIndex)
-            where T : struct
+            
         {
             int? length = ReadArrayLength(srcBytes, ref startIndex);
 
@@ -292,7 +292,7 @@ namespace StructPacker
         }
 
         private static void WriteArray1DFast<T>(T[] arr, int itemSize, byte[] targetBytes, ref int index)
-            where T : struct
+            
         {
             if (WriteArrayLength(arr, targetBytes, ref index) > 0)
             {

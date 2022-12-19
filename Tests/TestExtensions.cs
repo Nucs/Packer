@@ -116,20 +116,6 @@ namespace Tests
         }
 
         [DebuggerStepThrough]
-        public static void TestHasValue<T>(this T? value, bool expected = true)
-            where T : struct
-        {
-            Assert.AreEqual(expected, value.HasValue);
-        }
-
-        [DebuggerStepThrough]
-        public static void TestHasNotValue<T>(this T? value, bool expected = true)
-            where T : struct
-        {
-            Assert.AreEqual(expected, !value.HasValue);
-        }
-
-        [DebuggerStepThrough]
         public static void TestNotEqual<T>(this T actual, T expected)
         {
             Assert.AreNotEqual(expected, actual);

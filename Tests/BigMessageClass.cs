@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,7 +6,7 @@ using StructPacker;
 
 namespace Tests
 {
-    internal struct BigMessage : IEquatable<BigMessage>
+    internal class BigMessageClass : IEquatable<BigMessageClass>
     {
         public short Prop1 { get; set; }
         public int Prop2 { get; set; }
@@ -40,9 +40,10 @@ namespace Tests
         public float[] Prop30 { get; set; }
         public double[] Prop31 { get; set; }
         public decimal[] Prop32 { get; set; }
+        public BigMessageClass() { }
 
-        public BigMessage(bool _)
-            : this()
+        public BigMessageClass(bool _)
+            
         {
             Prop1 = short.MaxValue;
             Prop2 = int.MaxValue;
@@ -78,7 +79,7 @@ namespace Tests
             Prop32 = new[] { Prop29, Prop29 };
         }
 
-        public static void Unpack(ref BigMessage o, Stream src, byte[] gpbuffer)
+        public static void Unpack(ref BigMessageClass o, Stream src, byte[] gpbuffer)
         {
             o.Prop1 = Tools.ReadFromStream(o.Prop1, src, gpbuffer);
             o.Prop2 = Tools.ReadFromStream(o.Prop2, src, gpbuffer);
@@ -114,13 +115,13 @@ namespace Tests
             o.Prop32 = Tools.ReadFromStream(o.Prop32, src, gpbuffer);
         }
 
-        public static void Unpack(ref BigMessage msg, byte[] srcbytes, ref int startindex)
+        public static void Unpack(ref BigMessageClass msg, byte[] srcbytes, ref int startindex)
         {
             using PooledBuffer gpBuff = PooledBuffer.Get(16);
             Unpack(ref msg, new MemoryStream(srcbytes, startindex, srcbytes.Length - startindex), gpBuff.Data);
         }
 
-        public static void Pack(ref BigMessage msg, byte[] destbytes, ref int index)
+        public static void Pack(ref BigMessageClass msg, byte[] destbytes, ref int index)
         {
             Tools.Write(msg.Prop1, destbytes, ref index);
             Tools.Write(msg.Prop2, destbytes, ref index);
@@ -192,7 +193,7 @@ namespace Tests
                    + Tools.GetSize(Prop32);
         }
 
-        public bool Equals(BigMessage other)
+        public bool Equals(BigMessageClass other)
         {
             return Prop1 == other.Prop1
                    && Prop2 == other.Prop2
@@ -244,7 +245,7 @@ namespace Tests
 
         public override bool Equals(object obj)
         {
-            return obj is BigMessage other && Equals(other);
+            return obj is BigMessageClass other && Equals(other);
         }
 
         public override int GetHashCode()
@@ -252,12 +253,12 @@ namespace Tests
             return 0;
         }
 
-        public static bool operator ==(BigMessage left, BigMessage right)
+        public static bool operator ==(BigMessageClass left, BigMessageClass right)
         {
             return left.Equals(right);
         }
 
-        public static bool operator !=(BigMessage left, BigMessage right)
+        public static bool operator !=(BigMessageClass left, BigMessageClass right)
         {
             return !left.Equals(right);
         }

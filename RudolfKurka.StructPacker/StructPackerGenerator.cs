@@ -174,8 +174,24 @@ namespace RudolfKurka.StructPacker
             code.Line("/// <param name=\"msg\">Instance to deserialize into.</param>");
             code.Line("/// <param name=\"sourceData\">Buffer to read from.</param>");
             code.Line("/// <param name=\"startIndex\">Optional index to start reading the buffer from.</param>");
+            code.Line($"public static void Unpack(this {className} msg, {FqnByteArr} sourceData, int startIndex = 0) => {FqnTools}.UnpackMsg(ref msg, sourceData, ref startIndex, ReadPropsFromBytes);");
+           
+            code.Line("/// <summary>");
+            code.Line("/// Deserializes content from a byte array into the provided structure.");
+            code.Line("/// </summary>");
+            code.Line("/// <param name=\"msg\">Instance to deserialize into.</param>");
+            code.Line("/// <param name=\"sourceData\">Buffer to read from.</param>");
+            code.Line("/// <param name=\"startIndex\">Optional index to start reading the buffer from.</param>");
             code.Line($"public static void Unpack(this ref {className} msg, {FqnByteArr} sourceData, int startIndex = 0) => {FqnTools}.UnpackMsg(ref msg, sourceData, ref startIndex, ReadPropsFromBytes);");
            
+            code.Line("/// <summary>");
+            code.Line("/// Deserializes content from a byte array into the provided structure.");
+            code.Line("/// </summary>");
+            code.Line("/// <param name=\"msg\">Instance to deserialize into.</param>");
+            code.Line("/// <param name=\"sourceData\">Buffer to read from.</param>");
+            code.Line("/// <param name=\"startIndex\">Index to start reading the buffer from that will be incremented as data are read.</param>");
+            code.Line($"public static void Unpack(this {className} msg, {FqnByteArr} sourceData, ref int startIndex) => {FqnTools}.UnpackMsg(ref msg, sourceData, ref startIndex, ReadPropsFromBytes);");
+            
             code.Line("/// <summary>");
             code.Line("/// Deserializes content from a byte array into the provided structure.");
             code.Line("/// </summary>");
@@ -189,6 +205,13 @@ namespace RudolfKurka.StructPacker
             code.Line("/// </summary>");
             code.Line("/// <param name=\"msg\">Instance to deserialize into.</param>");
             code.Line("/// <param name=\"sourceStream\">Stream to read from.</param>");
+            code.Line($"public static void Unpack(this {className} msg, {FqnStream} sourceStream) => {FqnTools}.UnpackMsg(ref msg, sourceStream, ReadPropsFromStream);");
+            
+            code.Line("/// <summary>");
+            code.Line("/// Deserializes content from a stream into the provided structure.");
+            code.Line("/// </summary>");
+            code.Line("/// <param name=\"msg\">Instance to deserialize into.</param>");
+            code.Line("/// <param name=\"sourceStream\">Stream to read from.</param>");
             code.Line($"public static void Unpack(this ref {className} msg, {FqnStream} sourceStream) => {FqnTools}.UnpackMsg(ref msg, sourceStream, ReadPropsFromStream);");
             
             code.Line("/// <summary>");
@@ -196,7 +219,21 @@ namespace RudolfKurka.StructPacker
             code.Line("/// </summary>");
             code.Line("/// <param name=\"msg\">Instance to serialize.</param>");
             code.Line("/// <param name=\"destinationStream\">Target stream to write into.</param>");
+            code.Line($"public static void Pack(this {className} msg, {FqnStream} destinationStream) => {FqnTools}.PackMsgToStream(ref msg, destinationStream, GetSize(ref msg), WriteProps);");
+           
+            code.Line("/// <summary>");
+            code.Line("/// Serializes provided structure into a stream.");
+            code.Line("/// </summary>");
+            code.Line("/// <param name=\"msg\">Instance to serialize.</param>");
+            code.Line("/// <param name=\"destinationStream\">Target stream to write into.</param>");
             code.Line($"public static void Pack(this ref {className} msg, {FqnStream} destinationStream) => {FqnTools}.PackMsgToStream(ref msg, destinationStream, GetSize(ref msg), WriteProps);");
+           
+            code.Line("/// <summary>");
+            code.Line("/// Serializes provided structure into a byte array.");
+            code.Line("/// </summary>");
+            code.Line("/// <param name=\"msg\">Instance to serialize.</param>");
+            code.Line("/// <returns>Resulting byte array that contains the serialized structure.</returns>");
+            code.Line($"public static {FqnByteArr} Pack(this {className} msg) => {FqnTools}.PackMsgToArray(ref msg, GetSize(ref msg), WriteProps);");
            
             code.Line("/// <summary>");
             code.Line("/// Serializes provided structure into a byte array.");
@@ -210,9 +247,22 @@ namespace RudolfKurka.StructPacker
             code.Line("/// </summary>");
             code.Line("/// <param name=\"msg\">Instance to serialize.</param>");
             code.Line("/// <returns>Disposable memory buffer that contains the serialized structure.</returns>");
+            code.Line($"public static {FqnPooledBuffer} PackToBuffer(this {className} msg) => {FqnTools}.PackMsgToBuffer(ref msg, GetSize(ref msg), WriteProps);");
+
+            code.Line("/// <summary>");
+            code.Line("/// Serializes provided structure into a pooled memory buffer.");
+            code.Line("/// </summary>");
+            code.Line("/// <param name=\"msg\">Instance to serialize.</param>");
+            code.Line("/// <returns>Disposable memory buffer that contains the serialized structure.</returns>");
             code.Line($"public static {FqnPooledBuffer} PackToBuffer(this ref {className} msg) => {FqnTools}.PackMsgToBuffer(ref msg, GetSize(ref msg), WriteProps);");
 
             using (code.CodeBlock($"private static void ReadPropsFromStream(ref {className} msg, {FqnStream} srcStream, {FqnByteArr} gpBuffer)"))
+            {
+                foreach (string id in fields)
+                    code.Line($"msg.{id} = {FqnTools}.ReadFromStream(msg.{id}, srcStream, gpBuffer);");
+            }
+
+            using (code.CodeBlock($"private static void ReadPropsFromStream({className} msg, {FqnStream} srcStream, {FqnByteArr} gpBuffer)"))
             {
                 foreach (string id in fields)
                     code.Line($"msg.{id} = {FqnTools}.ReadFromStream(msg.{id}, srcStream, gpBuffer);");
@@ -223,8 +273,20 @@ namespace RudolfKurka.StructPacker
                 foreach (string id in fields)
                     code.Line($"msg.{id} = {FqnTools}.ReadFromBytes(msg.{id}, srcBytes, ref startIndex);");
             }
+            
+            using (code.CodeBlock($"private static void ReadPropsFromBytes({className} msg, {FqnByteArr} srcBytes, ref int startIndex)"))
+            {
+                foreach (string id in fields)
+                    code.Line($"msg.{id} = {FqnTools}.ReadFromBytes(msg.{id}, srcBytes, ref startIndex);");
+            }
 
             using (code.CodeBlock($"private static void WriteProps(ref {className} msg, byte[] destBytes, ref int startIndex)"))
+            {
+                foreach (string id in fields)
+                    code.Line($"{FqnTools}.Write(msg.{id}, destBytes, ref startIndex);");
+            }
+            
+            using (code.CodeBlock($"private static void WriteProps({className} msg, byte[] destBytes, ref int startIndex)"))
             {
                 foreach (string id in fields)
                     code.Line($"{FqnTools}.Write(msg.{id}, destBytes, ref startIndex);");
